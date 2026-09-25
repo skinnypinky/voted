@@ -12,6 +12,7 @@ CREATE TABLE ledamot(
     intressent_id TEXT PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
+    full_name TEXT NOT NULL,
     valkrets_id INT NOT NULL REFERENCES valkrets(valkrets_id),
     parti_id TEXT NOT NULL REFERENCES parti(parti_id)
 );

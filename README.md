@@ -28,5 +28,16 @@ docker compose exec db psql -U postgres -d voted
 stop db:
 docker compose down
 
+clear db:
+docker compose down -v
+
+run temp schema:
+docker compose exec -T db \
+  psql -U postgres -d voted \
+  < database/temp\_schema.sql
+
 to get votes for latest mandatperiod:
 run download\_data.sh (located in importer)
+
+activate the venv with:
+source ../.venv/bin/activate
