@@ -27,3 +27,6 @@ docker compose exec db psql -U postgres -d voted
 
 stop db:
 docker compose down
+
+to get votes for latest mandatperiod:
+run download\_data.sh (located in importer)
