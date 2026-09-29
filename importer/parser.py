@@ -34,7 +34,7 @@ def main():
 
     cur = conn.cursor()
 
-    current_dir = os.path.join(os.getcwd() + "/data")
+    current_dir = os.path.join(os.getcwd() + "/importer/data")
     
     for dir_name in os.listdir(current_dir):
         dir_path = os.path.join(current_dir, dir_name)

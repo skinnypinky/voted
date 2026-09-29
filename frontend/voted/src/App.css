@@ -1,0 +1,56 @@
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+img {
+  width: 200px;
+}
+
+h1 {
+  font-size: 4rem;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 2px white;
+}
+
+select {
+  width: 150px;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 2rem auto;
+  justify-content: center;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.search-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+button {
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0 1rem;
+  cursor: pointer;
+}
