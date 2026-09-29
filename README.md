@@ -13,31 +13,31 @@ docker compose up -d
 check with:
 docker compose ps
 
-available at:
-localhost:5433
+create outline of db:
+docker compose exec -T db psql -U postgres -d voted < database/temp\_schema.sql
 
-db config:
-Database: voted
-User: postgres
-Password: postgres
-Port: 5433
+cd importer
+sh download\_data.sh
 
-connect to psql:
+cd ..
+### First time setup
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+### Afterwards
+source .venv/bin/activate
+
+python3 importer/parser.py
+
+### Exit venv
+deactivate
+
+test with psql:
 docker compose exec db psql -U postgres -d voted
 
 stop db:
 docker compose down
 
-clear db:
+or completely reset db:
 docker compose down -v
-
-run temp schema:
-docker compose exec -T db \
-  psql -U postgres -d voted \
-  < database/temp\_schema.sql
-
-to get votes for latest mandatperiod:
-run download\_data.sh (located in importer)
-
-activate the venv with:
-source ../.venv/bin/activate
