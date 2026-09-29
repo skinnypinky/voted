@@ -5,7 +5,7 @@ CREATE TABLE valkrets(
 
 CREATE TABLE parti(
     parti_id TEXT PRIMARY KEY,
-    name TEXT
+    parti_name TEXT
 );
 
 CREATE TABLE ledamot(
@@ -19,7 +19,7 @@ CREATE TABLE ledamot(
 
 CREATE TABLE utskott(
     utskott_id TEXT PRIMARY KEY,
-    name TEXT
+    utskott_name TEXT
 );
 
 CREATE TABLE arende(

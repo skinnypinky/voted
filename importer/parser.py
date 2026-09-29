@@ -15,17 +15,29 @@ def parse_file(file_path, cur):
         for vote in votes:
             db_add(vote, cur)
 
-def db_add(vote, cur):
-    valkrets_id = vote["valkretsnummer"]
-    valkrets_name = vote["valkrets"]
+def party_name(party_abbreviation):
+    with open(os.path.join(os.getcwd(), "importer", "data", "parties.json")) as f:
+        parties = json.load(f)
 
+    return parties["parties"][party_abbreviation]
+
+def db_add(vote, cur):
     cur.execute(
         """
         INSERT INTO valkrets (valkrets_id, valkrets_name)
         VALUES (%s, %s)
         ON CONFLICT (valkrets_id) DO NOTHING;
         """,
-        (valkrets_id, valkrets_name)
+        (vote["valkretsnummer"], vote["valkrets"])
+        )
+
+    cur.execute(
+        """
+        INSERT INTO parti (parti_id, parti_name)
+        VALUES (%s, %s)
+        ON CONFLICT (parti_id) DO NOTHING;
+        """,
+        (vote["parti"], party_name(vote["parti"]))
         )
 
 # populate_db

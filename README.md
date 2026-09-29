@@ -14,7 +14,7 @@ check with:
 docker compose ps
 
 create outline of db:
-docker compose exec -T db psql -U postgres -d voted < database/schema.sql
+docker compose exec -T db psql -U postgres -d voted < database/migrations/\<schema\_name\>.sql
 
 cd importer
 sh download\_data.sh
