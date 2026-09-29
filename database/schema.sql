@@ -1,6 +1,6 @@
 CREATE TABLE valkrets(
     valkrets_id INT PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+    valkrets_name TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE parti(
@@ -44,7 +44,7 @@ CREATE TABLE votering(
 CREATE TABLE rost (
     votering_id TEXT NOT NULL REFERENCES votering(votering_id),
     intressent_id TEXT NOT NULL REFERENCES ledamot(intressent_id),
-    rost TEXT CHECK NOT NULL (rost IN ('Ja', 'Nej', 'Avstår', 'Frånvarande')),
+    rost TEXT NOT NULL CHECK (rost IN ('Ja', 'Nej', 'Avstår', 'Frånvarande')),
     parti_id TEXT REFERENCES parti(parti_id),
     valkrets_id INT REFERENCES valkrets(valkrets_id),
     PRIMARY KEY (votering_id, intressent_id)

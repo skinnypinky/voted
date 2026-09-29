@@ -16,15 +16,16 @@ def parse_file(file_path, cur):
             db_add(vote, cur)
 
 def db_add(vote, cur):
-    full_name = vote["namn"]
-    constituency = vote["valkrets"]
+    valkrets_id = vote["valkretsnummer"]
+    valkrets_name = vote["valkrets"]
 
     cur.execute(
         """
-        INSERT INTO voter (full_name, constituency)
+        INSERT INTO valkrets (valkrets_id, valkrets_name)
         VALUES (%s, %s)
+        ON CONFLICT (valkrets_id) DO NOTHING;
         """,
-        (full_name, constituency)
+        (valkrets_id, valkrets_name)
         )
 
 # populate_db
@@ -34,7 +35,8 @@ def main():
 
     cur = conn.cursor()
 
-    current_dir = os.path.join(os.getcwd() + "importer/data")
+    current_dir = os.path.join(os.getcwd(), "importer", "data")
+    print(current_dir)
     
     for dir_name in os.listdir(current_dir):
         dir_path = os.path.join(current_dir, dir_name)
