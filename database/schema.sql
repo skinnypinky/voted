@@ -1,11 +1,11 @@
 CREATE TABLE valkrets(
-    valkrets_id SERIAL PRIMARY KEY,
+    valkrets_id INT PRIMARY KEY,
     name TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE parti(
     parti_id TEXT PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+    name TEXT
 );
 
 CREATE TABLE ledamot(
@@ -19,11 +19,35 @@ CREATE TABLE ledamot(
 
 CREATE TABLE utskott(
     utskott_id TEXT PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+    name TEXT
 );
 
 CREATE TABLE arende(
-    dok_id TEXT PRIMARY KEY,
+    hangar_id TEXT PRIMARY KEY,
     notation TEXT NOT NULL,
-    
+    riksmote TEXT NOT NULL,
+    title TEXT NOT NULL,
+    utskott_id TEXT NOT NULL REFERENCES utskott(utskott_id),
+    UNIQUE (notation, riksmote)
 );
+
+CREATE TABLE votering(
+    votering_id TEXT PRIMARY KEY,
+    hangar_id TEXT NOT NULL REFERENCES arende(hangar_id),
+    point INT,
+    title TEXT NOT NULL,
+    description TEXT,
+    votering_type TEXT,
+    votering_date DATE NOT NULL
+);
+
+CREATE TABLE rost (
+    votering_id TEXT NOT NULL REFERENCES votering(votering_id),
+    intressent_id TEXT NOT NULL REFERENCES ledamot(intressent_id),
+    rost TEXT CHECK NOT NULL (rost IN ('Ja', 'Nej', 'Avstår', 'Frånvarande')),
+    parti_id TEXT REFERENCES parti(parti_id),
+    valkrets_id INT REFERENCES valkrets(valkrets_id),
+    PRIMARY KEY (votering_id, intressent_id)
+);
+
+
