@@ -1,0 +1,41 @@
+.search-page {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;   
+}
+
+.results-list {
+    display flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.result-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #ddd;
+    background: white;
+}
+
+.result-card:last-child {
+    border-bottom: none;
+}
+
+.visa-btn {
+    background: black;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.visa-btn:hover {
+    background: #f5f5f5;
+}

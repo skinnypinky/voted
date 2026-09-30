@@ -6,7 +6,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 echo "Starting database..."
-docker compose up -d
+docker-compose up -d
 
 echo "Importing voting data..."
 .venv/bin/python importer/parser.py

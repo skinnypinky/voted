@@ -1,8 +1,4 @@
-body {
-  overflow: hidden;
-  background-image: url('./assets/riksdagen.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+body, html {
+  margin: 0;
+  padding: 0;
 }
