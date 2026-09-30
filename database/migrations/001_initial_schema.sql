@@ -10,8 +10,6 @@ CREATE TABLE parti(
 
 CREATE TABLE ledamot(
     intressent_id TEXT PRIMARY KEY,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
     full_name TEXT NOT NULL,
     valkrets_id INT NOT NULL REFERENCES valkrets(valkrets_id),
     parti_id TEXT NOT NULL REFERENCES parti(parti_id)
@@ -27,7 +25,7 @@ CREATE TABLE arende(
     notation TEXT NOT NULL,
     riksmote TEXT NOT NULL,
     title TEXT NOT NULL,
-    utskott_id TEXT NOT NULL REFERENCES utskott(utskott_id),
+    utskott_id TEXT REFERENCES utskott(utskott_id),
     UNIQUE (notation, riksmote)
 );
 
@@ -38,7 +36,7 @@ CREATE TABLE votering(
     title TEXT NOT NULL,
     description TEXT,
     votering_type TEXT,
-    votering_date DATE NOT NULL
+    votering_date DATE
 );
 
 CREATE TABLE rost (
