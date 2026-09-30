@@ -10,14 +10,11 @@ The web app will let users select region, committee and search by keywords to fi
 From root:
 docker compose up -d
 
-check with:
-docker compose ps
-
 create outline of db:
-docker compose exec -T db psql -U postgres -d voted < database/migrations/\<schema\_name\>.sql
+docker compose exec -T db psql -U postgres -d voted < database/migrations/<schema_name>.sql
 
 cd importer
-sh download\_data.sh
+sh download_data.sh
 
 cd ..
 ### First time setup
@@ -25,16 +22,8 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-### Afterwards
-source .venv/bin/activate
-
-python3 importer/parser.py
-
-### Exit venv
-deactivate
-
-test with psql:
-docker compose exec db psql -U postgres -d voted
+### Populate and validate
+bash importer/run.sh
 
 stop db:
 docker compose down
