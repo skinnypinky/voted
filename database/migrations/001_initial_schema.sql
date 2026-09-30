@@ -41,8 +41,6 @@ CREATE TABLE votering(
     votering_id TEXT PRIMARY KEY,
     hangar_id TEXT NOT NULL REFERENCES arende(hangar_id),
     point INT,
-    title TEXT NOT NULL,
-    description TEXT,
     votering_type TEXT,
     votering_date DATE
 );

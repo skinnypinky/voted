@@ -1,6 +1,7 @@
 import os
 import json
 import psycopg
+from riksdagen import get_document
 
 seen_valkrets = set()
 seen_parti = set()
@@ -10,6 +11,8 @@ weird_ids = set()
 seen_arende = set()
 seen_votering = set()
 
+document_cache = {}
+
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
 with open(os.path.join(DATA_DIR, "parties.json")) as f:
@@ -17,6 +20,14 @@ with open(os.path.join(DATA_DIR, "parties.json")) as f:
 
 with open(os.path.join(DATA_DIR, "utskott.json")) as f:
     committees = json.load(f)["committees"]
+
+def get_document_cached(notation, riksmote):
+    key = (notation, riksmote)
+
+    if key not in document_cache:
+        document_cache[key] = get_document(notation, riksmote)
+
+    return document_cache[key]
 
 def dir_iterator(current_dir, cur, conn):
     for file_name in os.listdir(current_dir):
@@ -105,15 +116,40 @@ def db_add(vote, cur):
 
 
     arende_id = vote["hangar_id"]
+
     if arende_id not in seen_arende:
+
+        if beteckning and beteckning[0].isalpha():
+            doc = get_document_cached(vote["beteckning"], vote["rm"])
+
+            if doc:
+                title = doc["title"]
+            else:
+                title = "Okänt ärende"
+
+        else:
+            title = "Okänt ärende"
+
+            if beteckning not in weird_ids:
+                print("Unknown designation:", beteckning)
+                weird_ids.add(beteckning)
+
         cur.execute(
             """
-            INSERT INTO arende (hangar_id, notation, riksmote, title, utskott_id)
+            INSERT INTO arende
+            (hangar_id, notation, riksmote, title, utskott_id)
             VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (hangar_id) DO NOTHING;
             """,
-            (arende_id, vote["beteckning"], vote["rm"], "-", utskott_id)
+            (
+                arende_id,
+                vote["beteckning"],
+                vote["rm"],
+                title,
+                utskott_id
             )
+        )
+
         seen_arende.add(arende_id)
 
 
@@ -121,11 +157,11 @@ def db_add(vote, cur):
     if votering_id not in seen_votering:
         cur.execute(
             """
-            INSERT INTO votering (votering_id, hangar_id, point, title, description, votering_type, votering_date)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO votering (votering_id, hangar_id, point, votering_type, votering_date)
+            VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (votering_id) DO NOTHING;
             """,
-            (votering_id, vote["hangar_id"], vote["punkt"], "-", "-", vote["votering"], vote["datum"])
+            (votering_id, vote["hangar_id"], vote["punkt"], vote["votering"], vote["datum"])
             )
         seen_votering.add(votering_id)
 
@@ -145,15 +181,13 @@ def main():
         "postgresql://postgres:postgres@localhost:5433/voted")
 
     cur = conn.cursor()
-
-    current_dir = os.path.join(os.getcwd(), "importer", "data")
-    print(current_dir)
     
-    for dir_name in os.listdir(current_dir):
-        dir_path = os.path.join(current_dir, dir_name)
+    for dir_name in os.listdir(DATA_DIR):
+        dir_path = os.path.join(DATA_DIR, dir_name)
         if os.path.isdir(dir_path):
             dir_iterator(dir_path, cur, conn)
 
+    conn.commit()
     cur.close()
     conn.close()
 
