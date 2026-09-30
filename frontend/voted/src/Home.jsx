@@ -1,0 +1,72 @@
+import './Home.css'
+import alex from './assets/alex.png'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+
+function Home() {                
+  const [constituencies, setConstituencies] = useState([])
+  const [categories, setCategories] = useState([])
+  const navigate = useNavigate()
+
+  const [selectedValkrets, setSelectedValkrets] = useState("")
+  const [selectedUtskott, setSelectedUtskott] = useState("")
+
+  function handleSearch() {
+    fetch('http://127.0.0.1:5000/api/search', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        valkrets: selectedValkrets,
+        utskott: selectedUtskott
+      })
+    })
+      .then(res => res.json())
+      .then(data => navigate('/search', { state: { results: data } }))
+  }
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:5000/api/constituency')
+      .then(response => response.json())
+      .then(data => setConstituencies(data))
+  }, [])
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:5000/api/utskott')
+      .then(response => response.json())
+      .then(data => setCategories(data))
+  }, [])
+  
+  return (
+    <div className="background">
+      <main>
+        <h1>VOTED</h1>
+        <img src={alex} />
+        <div className="filter-bar">
+          <div className="filter-group">
+            <label>Valkrets</label>
+            <select onChange={(e) => setSelectedValkrets(e.target.value)}>
+              <option value="">Alla län</option>
+              {constituencies.map(c => (<option key={c} value={c}>{c}</option>))}
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>Utskott / Kategori</label>
+            <select onChange={(e) => setSelectedUtskott(e.target.value)}>
+              <option value="">Alla utskott</option>
+              {categories.map(c => (<option key={c} value={c}>{c}</option>))}
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>Sök efter fråga</label>
+            <div className="search-row">
+              <input type="" placeholder="Sök..." />
+              <button onClick={handleSearch}>Sök</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export default Home

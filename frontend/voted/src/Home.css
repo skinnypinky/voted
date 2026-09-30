@@ -6,6 +6,15 @@ main {
   height: 80vh;
 }
 
+.background {
+  background-image: url('./assets/riksdagen.jpg');
+  min-height: 100vh;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 img {
   width: 200px;
 }

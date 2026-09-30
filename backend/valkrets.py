@@ -5,7 +5,7 @@ def get_all_constituency():
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(
-            "SELECT distinct constituency FROM voter ORDER BY constituency;"
+            "SELECT valkrets_name FROM valkrets ORDER BY valkrets_name;"
         )
         constituency = cur.fetchall()
         cur.close()
