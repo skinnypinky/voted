@@ -38,6 +38,19 @@ def get_votering_titles(status_url):
     return titles
 
 
+def get_pdf_url(document):
+    filbilaga = document.get("filbilaga") or {}
+    files = filbilaga.get("fil") or []
+
+    if isinstance(files, dict):
+        files = [files]
+
+    for file in files:
+        if file.get("typ") == "pdf" and file.get("url"):
+            return file["url"].strip()
+            
+    return None
+
 def get_document(beteckning, riksmote):
     url = (
         "https://data.riksdagen.se/dokumentlista/"
@@ -57,9 +70,12 @@ def get_document(beteckning, riksmote):
             return {
                 "dok_id": document["dok_id"],
                 "title": document["titel"],
-                "votering_titles": get_votering_titles(
-                    document.get("dokumentstatus_url_xml")
-                )
+                "votering_titles": get_votering_titles(document.get("dokumentstatus_url_xml")),
+                "notisrubrik": (document.get("notisrubrik") or "").strip() or None,
+                "summary": (document.get("summary") or "").strip() or None,
+                "organ": (document.get("organ") or "").strip() or None,
+                "url": get_pdf_url(document)
             }
-
+    
+    print("No matching document:", beteckning, riksmote)
     return None
