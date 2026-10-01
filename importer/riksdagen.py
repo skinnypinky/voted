@@ -45,6 +45,3 @@ def get_document(beteckning, riksmote):
     
     print("No matching document:", beteckning, riksmote)
     return None
-
-# Det finns flera fält i dokumentet som kan vara relevanta, t.ex. "notisrubrik", "summary" och "organ".
-# Potentiellt kan man hämta urlänkar till dokumenten också, men det är inte nödvändigt för att få titeln.
