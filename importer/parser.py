@@ -154,15 +154,35 @@ def db_add(vote, cur):
 
 
     votering_id = vote["votering_id"]
+
     if votering_id not in seen_votering:
+
+        votering_title = None
+
+        if beteckning and beteckning[0].isalpha():
+            doc = get_document_cached(beteckning, vote["rm"])
+
+            if doc:
+                votering_title = doc["votering_titles"].get(votering_id.upper())
+
         cur.execute(
             """
-            INSERT INTO votering (votering_id, hangar_id, point, votering_type, votering_date)
-            VALUES (%s, %s, %s, %s, %s)
-            ON CONFLICT (votering_id) DO NOTHING;
+            INSERT INTO votering
+                (votering_id, hangar_id, point, title, votering_type, votering_date)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (votering_id) DO UPDATE
+            SET title = EXCLUDED.title;
             """,
-            (votering_id, vote["hangar_id"], vote["punkt"], vote["votering"], vote["datum"])
+            (
+                votering_id,
+                vote["hangar_id"],
+                vote["punkt"],
+                votering_title,
+                vote["votering"],
+                vote["datum"]
             )
+        )
+
         seen_votering.add(votering_id)
 
 
