@@ -1,5 +1,18 @@
 import requests
 
+def get_pdf_url(document):
+    filbilaga = document.get("filbilaga") or {}
+    files = filbilaga.get("fil") or []
+
+    if isinstance(files, dict):
+        files = [files]
+
+    for file in files:
+        if file.get("typ") == "pdf" and file.get("url"):
+            return file["url"].strip()
+            
+    return None
+
 def get_document(beteckning, riksmote):
     url = (
         "https://data.riksdagen.se/dokumentlista/"
@@ -23,8 +36,15 @@ def get_document(beteckning, riksmote):
             and document.get("rm") == riksmote
         ):
             return {
-                "title": document["titel"]
+                "title": document["titel"],
+                "notisrubrik": (document.get("notisrubrik") or "").strip() or None,
+                "summary": (document.get("summary") or "").strip() or None,
+                "organ": (document.get("organ") or "").strip() or None,
+                "url": get_pdf_url(document)
             }
-
+    
     print("No matching document:", beteckning, riksmote)
     return None
+
+# Det finns flera fält i dokumentet som kan vara relevanta, t.ex. "notisrubrik", "summary" och "organ".
+# Potentiellt kan man hämta urlänkar till dokumenten också, men det är inte nödvändigt för att få titeln.

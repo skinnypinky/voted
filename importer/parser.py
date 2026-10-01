@@ -118,12 +118,20 @@ def db_add(vote, cur):
     arende_id = vote["hangar_id"]
 
     if arende_id not in seen_arende:
+        notisrubrik = None
+        summary = None
+        organ = None
+        url = None
 
         if beteckning and beteckning[0].isalpha():
             doc = get_document_cached(vote["beteckning"], vote["rm"])
 
             if doc:
                 title = doc["title"]
+                notisrubrik = doc["notisrubrik"]
+                summary = doc["summary"]
+                organ = doc["organ"]
+                url = doc["url"]
             else:
                 title = "Okänt ärende"
 
@@ -137,8 +145,8 @@ def db_add(vote, cur):
         cur.execute(
             """
             INSERT INTO arende
-            (hangar_id, notation, riksmote, title, utskott_id)
-            VALUES (%s, %s, %s, %s, %s)
+            (hangar_id, notation, riksmote, title, utskott_id, notisrubrik, summary, organ, url)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (hangar_id) DO NOTHING;
             """,
             (
@@ -146,7 +154,11 @@ def db_add(vote, cur):
                 vote["beteckning"],
                 vote["rm"],
                 title,
-                utskott_id
+                utskott_id,
+                notisrubrik,
+                summary,
+                organ,
+                url
             )
         )
 
