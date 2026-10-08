@@ -7,7 +7,6 @@ seen_valkrets = set()
 seen_parti = set()
 seen_ledamot = set()
 seen_utskott = set()
-weird_ids = set()
 seen_arende = set()
 seen_votering = set()
 
@@ -43,8 +42,10 @@ def parse_file(file_path, cur):
         for vote in votes:
             db_add(vote, cur)
 
+#change name to populate db
 def db_add(vote, cur):
     valkrets_id = vote["valkretsnummer"]
+    beteckning = vote["beteckning"]
 
     if valkrets_id not in seen_valkrets:
         cur.execute(
@@ -82,71 +83,54 @@ def db_add(vote, cur):
             )
         seen_ledamot.add(ledamot)
 
-
-    beteckning = vote["beteckning"]
-
-    if beteckning and beteckning[0].isalpha():
-        utskott_id = beteckning.rstrip("0123456789")
-
-        if utskott_id not in seen_utskott:
-            try:
-                utskott_name = committees[utskott_id]
-            except KeyError:
-                utskott_name = "Okänt eller ej klassificerat"
-
-            cur.execute(
-                """
-                INSERT INTO utskott (utskott_id, utskott_name)
-                VALUES (%s, %s)
-                ON CONFLICT (utskott_id) DO NOTHING;
-                """,
-                (utskott_id, utskott_name)
-                )
-            seen_utskott.add(utskott_id)
-
-    else:
-        # if the id is in the wrong format it is a revote or some other weird shit
-        # dont know how to handle that atm
-        utskott_id = None
-        utskott_name = None
-
-        if beteckning not in weird_ids:
-            print("Unknown designation:", vote["beteckning"])
-            weird_ids.add(beteckning)
-
-
     arende_id = vote["hangar_id"]
 
     if arende_id not in seen_arende:
+        title = "Okänt ärende"
         notisrubrik = None
         summary = None
         organ = None
         url = None
+        utskott_id = None
 
         if beteckning and beteckning[0].isalpha():
-            doc = get_document_cached(vote["beteckning"], vote["rm"])
+            doc = get_document_cached(beteckning, vote["rm"])
 
             if doc:
                 title = doc["title"]
                 notisrubrik = doc["notisrubrik"]
                 summary = doc["summary"]
                 organ = doc["organ"]
+
+                if not organ or organ == "-":
+                    utskott_id = None
+                else:
+                    utskott_id = organ
+
+                    if utskott_id not in seen_utskott:
+                        utskott_name = committees.get(
+                            utskott_id,
+                            "Okänt eller ej klassificerat"
+                        )
+                    
+                        cur.execute(
+                            """
+                            INSERT INTO utskott (utskott_id, utskott_name)
+                            VALUES (%s, %s)
+                            ON CONFLICT (utskott_id) DO NOTHING;
+                            """,
+                            (utskott_id, utskott_name)
+                            )
+                        seen_utskott.add(utskott_id)
+
                 url = doc["url"]
-            else:
-                title = "Okänt ärende"
 
-        else:
-            title = "Okänt ärende"
-
-            if beteckning not in weird_ids:
-                print("Unknown designation:", beteckning)
-                weird_ids.add(beteckning)
 
         cur.execute(
             """
             INSERT INTO arende
-            (hangar_id, notation, riksmote, title, utskott_id, notisrubrik, summary, organ, url)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (hangar_id, notation, riksmote, title, utskott_id, notisrubrik, summary, url)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (hangar_id) DO NOTHING;
             """,
             (
@@ -157,7 +141,6 @@ def db_add(vote, cur):
                 utskott_id,
                 notisrubrik,
                 summary,
-                organ,
                 url
             )
         )
@@ -183,7 +166,7 @@ def db_add(vote, cur):
                 (votering_id, hangar_id, point, title, votering_type, votering_date)
             VALUES (%s, %s, %s, %s, %s, %s)
             ON CONFLICT (votering_id) DO UPDATE
-            SET title = EXCLUDED.title;
+            SET title = COALESCE(EXCLUDED.title, votering.title);
             """,
             (
                 votering_id,

@@ -17,6 +17,10 @@ sh download_data.sh
 ### Populate and validate
 bash importer/run.sh
 
+### Enter DB
+docker compose exec db psql -U postgres -d voted
+
+### Shutdown
 stop db:
 docker compose down
 
