@@ -6,21 +6,13 @@ We will populate the sql database using a script at startup by fetching from the
 The web app will let users select region, committee and search by keywords to find matching issues and its votes. By then selecting a specific vote, it will show the result and how every chosen representative voted on that specific issue.
 
 \# Instructions
-
-From root:
-docker compose up -d
-
-create outline of db:
-docker compose exec -T db psql -U postgres -d voted < database/migrations/<schema_name>.sql
-
-cd importer
-sh download_data.sh
-
-cd ..
 ### First time setup
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+
+cd importer
+sh download_data.sh
 
 ### Populate and validate
 bash importer/run.sh
