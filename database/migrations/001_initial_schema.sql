@@ -1,11 +1,3 @@
-DROP TABLE valkrets CASCADE;
-DROP TABLE parti CASCADE;
-DROP TABLE ledamot CASCADE;
-DROP TABLE utskott CASCADE;
-DROP TABLE arende CASCADE;
-DROP TABLE votering CASCADE;
-DROP TABLE rost CASCADE;
-
 CREATE TABLE valkrets(
     valkrets_id INT PRIMARY KEY,
     valkrets_name TEXT UNIQUE NOT NULL

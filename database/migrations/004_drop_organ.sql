@@ -1,0 +1,2 @@
+ALTER TABLE arende
+DROP COLUMN organ;

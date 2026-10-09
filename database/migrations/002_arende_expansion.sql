@@ -1,0 +1,5 @@
+ALTER TABLE arende
+ADD COLUMN notisrubrik TEXT,
+ADD COLUMN summary TEXT,
+ADD COLUMN organ TEXT,
+ADD COLUMN url TEXT;

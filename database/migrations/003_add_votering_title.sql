@@ -1,0 +1,2 @@
+ALTER TABLE votering
+ADD COLUMN title TEXT;
