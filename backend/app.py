@@ -22,22 +22,27 @@ def get_utskott():
 @app.route('/api/search', methods=['POST'])
 def search():
     data = request.get_json()
-    valkrets_name = data['valkrets']
-    utskott_name = data['utskott']
+    valkrets_name = data.get('valkrets') or None
+    utskott_name = data.get('utskott') or None
+    q = (data.get('q') or '').strip() or None
 
-    valkrets_id = get_valkrets_id(valkrets_name)
-    utskott_id = get_utskott_id(utskott_name)
+    valkrets_id = get_valkrets_id(valkrets_name) if valkrets_name else None
+    utskott_id = get_utskott_id(utskott_name) if utskott_name else None
 
-    if valkrets_id is None or utskott_id is None:
+    if (valkrets_name and valkrets_id is None) or (utskott_name and utskott_id is None):
         return jsonify([]), 200
 
-    search_results = get_search_results(valkrets_id, utskott_id)
+    search_results = get_search_results(valkrets_id, utskott_id, q)
     return jsonify([{
         "votering_id": row[0],
         "date": row[1].strftime("%Y-%m-%d") if row[1] else None,
         "utskott": row[2],
-        "valkrets_name": row[3],
-        "valkrets_id": row[4]
+        "rubrik": row[3] or row[4],
+        "votering_title": row[5],
+        "notation": row[6],
+        "riksmote": row[7],
+        "valkrets_name": valkrets_name,
+        "valkrets_id": valkrets_id,
     } for row in search_results]), 200
 
 @app.route('/api/votering', methods=['POST'])

@@ -7,10 +7,10 @@ def get_all_voting(votering_id, valkrets_id):
         cur.execute(
             "SELECT rost, COUNT(*) " \
             "FROM rost " \
-            "WHERE votering_id = %s "
-            "AND valkrets_id = %s "
+            "WHERE votering_id = %(votering_id)s "
+            "AND (%(valkrets_id)s::int IS NULL OR valkrets_id = %(valkrets_id)s::int) "
             "GROUP BY rost;",
-            (votering_id, valkrets_id)
+            {"votering_id": votering_id, "valkrets_id": valkrets_id}
         )
         voting = cur.fetchall()
         cur.close()
@@ -25,13 +25,17 @@ def get_specific_voting(votering_id, valkrets_id):
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(
-            "SELECT l.full_name, p.parti_name, r.rost " \
-            "FROM rost r " \
-            "JOIN ledamot l ON r.intressent_id = l.intressent_id " \
-            "JOIN parti p ON l.parti_id = p.parti_id " \
-            "WHERE r.votering_id = %s " \
-            "AND r.valkrets_id = %s;",
-            (votering_id, valkrets_id)
+            """
+            SELECT l.full_name, p.parti_name, r.rost
+            FROM rost r
+            JOIN ledamot l ON r.intressent_id = l.intressent_id
+            JOIN parti p   ON r.parti_id = p.parti_id
+            WHERE r.votering_id = %(votering_id)s
+                AND (%(valkrets_id)s::int IS NULL OR r.valkrets_id = %(valkrets_id)s::int)
+            ORDER BY p.parti_name COLLATE "sv-SE-x-icu", l.full_name COLLATE "sv-SE-x-icu";
+            """,
+            {"votering_id": votering_id, "valkrets_id": valkrets_id}
+
         )
         voting = cur.fetchall()
         cur.close()
