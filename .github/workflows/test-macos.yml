@@ -35,7 +35,11 @@ jobs:
             unzip -tq "votes-$year.zip"
 
             mkdir -p "extracted/$year"
-            unzip -oq "votes-$year.zip" -d "extracted/$year"
+            if [[ "$RUNNER_OS" == "macOS" ]]; then
+              ditto -x -k "votes-$year.zip" "extracted/$year"
+            else
+              unzip -oq "votes-$year.zip" -d "extracted/$year"
+            fi
 
             YEAR="$year" python3 - <<'PY'
           import os
