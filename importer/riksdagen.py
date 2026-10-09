@@ -79,3 +79,17 @@ def get_document(beteckning, riksmote):
     
     print("No matching document:", beteckning, riksmote)
     return None
+
+def get_ledamot_image(intressent_id):
+    url = (
+        "https://data.riksdagen.se/personlista/"
+        f"?iid={intressent_id}&utformat=json"
+    )
+
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+
+    data = response.json()
+
+    return data["personlista"]["person"]["bild_url_192"]
+    
