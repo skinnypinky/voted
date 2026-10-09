@@ -1,0 +1,24 @@
+
+python3 - <<'PY'
+from pathlib import Path
+import unicodedata
+
+for year in ["202223", "202324", "202425", "202526"]:
+    folder = Path("importer/data") / year
+
+    files = [
+        f.name for f in folder.iterdir()
+        if f.is_file() and f.suffix == ".json"
+    ]
+
+    normalized = {
+        unicodedata.normalize("NFD", name).casefold()
+        for name in files
+    }
+
+    print(f"\n{year}")
+    print(f"  Linux files:         {len(files)}")
+    print(f"  Distinct folded names: {len(normalized)}")
+    print(f"  Potential collisions: {len(files) - len(normalized)}")
+PY
+
