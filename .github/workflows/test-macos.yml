@@ -1,24 +1,76 @@
 
-python3 - <<'PY'
-from pathlib import Path
-import unicodedata
+name: Compare macOS and Linux extraction
 
-for year in ["202223", "202324", "202425", "202526"]:
-    folder = Path("importer/data") / year
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/test-macos.yml"
 
-    files = [
-        f.name for f in folder.iterdir()
-        if f.is_file() and f.suffix == ".json"
-    ]
+jobs:
+  compare:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
-    normalized = {
-        unicodedata.normalize("NFD", name).casefold()
-        for name in files
-    }
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
-    print(f"\n{year}")
-    print(f"  Linux files:         {len(files)}")
-    print(f"  Distinct folded names: {len(normalized)}")
-    print(f"  Potential collisions: {len(files) - len(normalized)}")
-PY
+    steps:
+      - name: Download and compare JSON extraction
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Operating system: $RUNNER_OS"
+
+          for year in 202223 202324 202425 202526; do
+            echo "========== $year =========="
+
+            curl -fL --retry 3 \
+              -o "votes-$year.zip" \
+              "https://data.riksdagen.se/dataset/votering/votering-$year.json.zip"
+
+            unzip -tq "votes-$year.zip"
+
+            mkdir -p "extracted/$year"
+            unzip -oq "votes-$year.zip" -d "extracted/$year"
+
+            YEAR="$year" python3 - <<'PY'
+          import os
+          import unicodedata
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          year = os.environ["YEAR"]
+
+          with ZipFile(f"votes-{year}.zip") as archive:
+              names = [
+                  name for name in archive.namelist()
+                  if name.lower().endswith(".json")
+              ]
+
+          normalized = {
+              unicodedata.normalize("NFD", name).casefold()
+              for name in names
+          }
+
+          extracted = [
+              path for path in Path("extracted", year).rglob("*")
+              if path.is_file() and path.suffix.lower() == ".json"
+          ]
+
+          print(f"Year: {year}")
+          print(f"ZIP JSON entries: {len(names)}")
+          print(f"Unique normalized names: {len(normalized)}")
+          print(f"Extracted JSON files: {len(extracted)}")
+          print(f"Potential filename collisions: {len(names) - len(normalized)}")
+
+          if len(names) != len(extracted):
+              print("MISMATCH: Some JSON entries did not become separate files")
+          else:
+              print("MATCH: All JSON entries extracted")
+          PY
+          done
 
