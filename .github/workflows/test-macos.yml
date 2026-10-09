@@ -1,5 +1,5 @@
 
-name: Compare macOS and Linux extraction
+name: Compare Linux, macOS and Windows extraction
 
 on:
   workflow_dispatch:
@@ -15,15 +15,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Download and compare JSON extraction
         shell: bash
         run: |
           set -euo pipefail
 
           echo "Operating system: $RUNNER_OS"
+          df -h .
 
           for year in 202223 202324 202425 202526; do
             echo "========== $year =========="
@@ -32,16 +38,38 @@ jobs:
               -o "votes-$year.zip" \
               "https://data.riksdagen.se/dataset/votering/votering-$year.json.zip"
 
-            unzip -tq "votes-$year.zip"
+            # Verify ZIP integrity
+            python - "votes-$year.zip" <<'PY'
+          import sys
+          import zipfile
+
+          with zipfile.ZipFile(sys.argv[1]) as archive:
+              bad = archive.testzip()
+              if bad is not None:
+                  raise RuntimeError(f"Corrupted ZIP entry: {bad}")
+
+          print("ZIP integrity verified")
+          PY
 
             mkdir -p "extracted/$year"
+
+            # Extract using the appropriate OS utility
             if [[ "$RUNNER_OS" == "macOS" ]]; then
+              echo "Extracting with macOS ditto..."
               ditto -x -k "votes-$year.zip" "extracted/$year"
+
+            elif [[ "$RUNNER_OS" == "Windows" ]]; then
+              echo "Extracting with Windows PowerShell..."
+              YEAR="$year" pwsh -NoProfile -Command \
+                '$y = $env:YEAR; Expand-Archive -LiteralPath "votes-$y.zip" -DestinationPath "extracted/$y" -Force'
+
             else
+              echo "Extracting with Linux unzip..."
               unzip -oq "votes-$year.zip" -d "extracted/$year"
             fi
 
-            YEAR="$year" python3 - <<'PY'
+            # Verify extracted file counts
+            YEAR="$year" python - <<'PY'
           import os
           import unicodedata
           from pathlib import Path
@@ -72,9 +100,18 @@ jobs:
           print(f"Potential filename collisions: {len(names) - len(normalized)}")
 
           if len(names) != len(extracted):
-              print("MISMATCH: Some JSON entries did not become separate files")
-          else:
-              print("MATCH: All JSON entries extracted")
+              raise SystemExit(
+                  f"ERROR: Expected {len(names)} files, "
+                  f"found {len(extracted)}"
+              )
+
+          print("MATCH: All JSON entries extracted")
           PY
+
+            # Free disk space before next year
+            rm -rf "extracted/$year"
+            rm -f "votes-$year.zip"
+
           done
 
+          echo "All extraction tests completed successfully."
