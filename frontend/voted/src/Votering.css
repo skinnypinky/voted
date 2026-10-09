@@ -1,0 +1,31 @@
+.votering-page {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.votering-table {
+    flex: 1;
+}
+
+.results-list {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.result-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #ddd;
+    background: white;
+    gap: 1rem;
+}
+
+.result-card:last-child {
+    border-bottom: none;
+}
