@@ -40,12 +40,10 @@ def parse_file(file_path, cur):
         json_d = json.load(f)
         votes = json_d["dokvotering"]["votering"]
         for vote in votes:
-            db_add(vote, cur)
+            populate_db(vote, cur)
 
-#change name to populate db
-def db_add(vote, cur):
+def add_valkrets(vote, cur):
     valkrets_id = vote["valkretsnummer"]
-    beteckning = vote["beteckning"]
 
     if valkrets_id not in seen_valkrets:
         cur.execute(
@@ -58,7 +56,9 @@ def db_add(vote, cur):
             )
         seen_valkrets.add(valkrets_id)
 
+def add_parti_id(vote, cur):
     parti_id = vote["parti"]
+
     if parti_id not in seen_parti:
         cur.execute(
             """
@@ -69,8 +69,8 @@ def db_add(vote, cur):
             (parti_id, parties[parti_id])
             )
         seen_parti.add(parti_id)
-        
 
+def add_ledamot(vote,cur):
     ledamot = vote["intressent_id"]
     if ledamot not in seen_ledamot:
         cur.execute(
@@ -83,7 +83,26 @@ def db_add(vote, cur):
             )
         seen_ledamot.add(ledamot)
 
+def add_utskott(utskott_id, cur):
+    if utskott_id not in seen_utskott:
+        utskott_name = committees.get(
+            utskott_id,
+            "Okänt eller ej klassificerat"
+        )
+    
+        cur.execute(
+            """
+            INSERT INTO utskott (utskott_id, utskott_name)
+            VALUES (%s, %s)
+            ON CONFLICT (utskott_id) DO NOTHING;
+            """,
+            (utskott_id, utskott_name)
+            )
+        seen_utskott.add(utskott_id)
+
+def add_arende(vote, cur):
     arende_id = vote["hangar_id"]
+    beteckning = vote["beteckning"]
 
     if arende_id not in seen_arende:
         title = "Okänt ärende"
@@ -106,22 +125,7 @@ def db_add(vote, cur):
                     utskott_id = None
                 else:
                     utskott_id = organ
-
-                    if utskott_id not in seen_utskott:
-                        utskott_name = committees.get(
-                            utskott_id,
-                            "Okänt eller ej klassificerat"
-                        )
-                    
-                        cur.execute(
-                            """
-                            INSERT INTO utskott (utskott_id, utskott_name)
-                            VALUES (%s, %s)
-                            ON CONFLICT (utskott_id) DO NOTHING;
-                            """,
-                            (utskott_id, utskott_name)
-                            )
-                        seen_utskott.add(utskott_id)
+                    add_utskott(utskott_id, cur)
 
                 url = doc["url"]
 
@@ -147,8 +151,9 @@ def db_add(vote, cur):
 
         seen_arende.add(arende_id)
 
-
+def add_votering(vote, cur):
     votering_id = vote["votering_id"]
+    beteckning = vote["beteckning"]
 
     if votering_id not in seen_votering:
 
@@ -180,17 +185,25 @@ def db_add(vote, cur):
 
         seen_votering.add(votering_id)
 
-
+def add_rost(vote, cur):
     cur.execute(
-        """
-        INSERT INTO rost (votering_id, intressent_id, rost, parti_id, valkrets_id)
-        VALUES (%s, %s, %s, %s, %s)
-        ON CONFLICT (votering_id, intressent_id) DO NOTHING;
-        """,
-        (vote["votering_id"], vote["intressent_id"], vote["rost"], vote["parti"],vote["valkretsnummer"])
-        )
+    """
+    INSERT INTO rost (votering_id, intressent_id, rost, parti_id, valkrets_id)
+    VALUES (%s, %s, %s, %s, %s)
+    ON CONFLICT (votering_id, intressent_id) DO NOTHING;
+    """,
+    (vote["votering_id"], vote["intressent_id"], vote["rost"], vote["parti"],vote["valkretsnummer"])
+    )
 
-# populate_db
+def populate_db(vote, cur):
+    add_valkrets(vote, cur)
+    add_parti_id(vote, cur)
+    add_ledamot(vote, cur)
+    add_arende(vote, cur)
+    add_votering(vote, cur)
+    add_rost(vote, cur)
+
+
 def main():
     conn = psycopg.connect(
         "postgresql://postgres:postgres@localhost:5433/voted")
