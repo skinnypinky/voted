@@ -14,6 +14,8 @@ pip install -r requirements.txt
 cd importer
 sh download_data.sh
 
+cp .env.example .env
+
 ### Populate and validate
 bash importer/run.sh
 
