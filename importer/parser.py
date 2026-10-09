@@ -2,6 +2,7 @@ import os
 import json
 import psycopg
 from riksdagen import get_document
+from riksdagen import get_ledamot_image
 
 seen_valkrets = set()
 seen_parti = set()
@@ -72,14 +73,17 @@ def add_parti_id(vote, cur):
 
 def add_ledamot(vote,cur):
     ledamot = vote["intressent_id"]
+    
     if ledamot not in seen_ledamot:
+        image_url = get_ledamot_image(ledamot)
+
         cur.execute(
             """
-            INSERT INTO ledamot (intressent_id, full_name, valkrets_id, parti_id)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO ledamot (intressent_id, full_name, valkrets_id, parti_id, birth_year, image_url)
+            VALUES (%s, %s, %s, %s, %s, %s)
             ON CONFLICT (intressent_id) DO NOTHING;
             """,
-            (vote["intressent_id"], vote["namn"],vote["valkretsnummer"],vote["parti"])
+            (vote["intressent_id"], vote["namn"],vote["valkretsnummer"],vote["parti"], vote["fodd"], image_url)
             )
         seen_ledamot.add(ledamot)
 

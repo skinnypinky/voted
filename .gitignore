@@ -5,3 +5,5 @@ node_modules/
 .DS_Store
 importer/data/
 .venv/
+importer/run.sh
+database/migrate.sh
