@@ -1,15 +1,14 @@
-import requests
 import xml.etree.ElementTree as ET
 from urllib.parse import urljoin
 
 
-def get_votering_titles(status_url):
+def get_votering_titles(status_url, session):
     if not status_url:
         return {}
 
     url = urljoin("https://data.riksdagen.se/", status_url)
 
-    response = requests.get(url, timeout=10)
+    response = session.get(url, timeout=10)
     response.raise_for_status()
 
     root = ET.fromstring(response.content)
@@ -51,13 +50,13 @@ def get_pdf_url(document):
             
     return None
 
-def get_document(beteckning, riksmote):
+def get_document(beteckning, riksmote, session):
     url = (
         "https://data.riksdagen.se/dokumentlista/"
         f"?rm={riksmote}&bet={beteckning}&doktyp=bet&utformat=json"
     )
 
-    response = requests.get(url, timeout=10)
+    response = session.get(url, timeout=10)
     response.raise_for_status()
 
     documents = response.json()["dokumentlista"]["dokument"]
@@ -70,7 +69,7 @@ def get_document(beteckning, riksmote):
             return {
                 "dok_id": document["dok_id"],
                 "title": document["titel"],
-                "votering_titles": get_votering_titles(document.get("dokumentstatus_url_xml")),
+                "votering_titles": get_votering_titles(document.get("dokumentstatus_url_xml"), session),
                 "notisrubrik": (document.get("notisrubrik") or "").strip() or None,
                 "summary": (document.get("summary") or "").strip() or None,
                 "organ": (document.get("organ") or "").strip() or None,
@@ -80,13 +79,13 @@ def get_document(beteckning, riksmote):
     print("No matching document:", beteckning, riksmote)
     return None
 
-def get_ledamot_image(intressent_id):
+def get_ledamot_image(intressent_id, session):
     url = (
         "https://data.riksdagen.se/personlista/"
         f"?iid={intressent_id}&utformat=json"
     )
 
-    response = requests.get(url, timeout=10)
+    response = session.get(url, timeout=10)
     response.raise_for_status()
 
     data = response.json()
