@@ -5,6 +5,7 @@ from valkrets import get_all_constituency
 from utskott import get_all_category
 from search import get_search_results, get_valkrets_id, get_utskott_id
 from votering import get_all_voting, get_specific_voting
+from ledamoter import get_all_ledamoter
 
 app = Flask(__name__)
 CORS(app)

@@ -7,6 +7,7 @@ function Votering() {
     const result = state?.result
     const [summary, setSummary] = useState([])
     const [details, setDetails] = useState([])
+    const selectedValkrets = state?.selectedValkrets
     const partyColors = {
         "Socialdemokraterna": '#E8112D',
         'Moderaterna': '#52BDEC',
@@ -33,15 +34,21 @@ function Votering() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 votering_id: result?.votering_id,
-                valkrets_id: result?.valkrets_id
+                valkrets_id: selectedValkrets ? result?.valkrets_id : null
             })
         })
         .then(res => res.json())
         .then(data => {
+            console.log(data)
             setDetails(data.details)
             setSummary(data.summary)
         })
     }, [result])
+
+    const summaryItems = (result?.summary || '')
+    .split(/<\/?p>/)
+    .map(s => s.trim())
+    .filter(Boolean);
 
     return (
         <div className="votering-page">
@@ -67,6 +74,22 @@ function Votering() {
                         </div>
                     ))}
                 </div>
+            </div>
+            <div className="votering-info">
+                <h2>{result?.titel || 'okänd'}</h2>
+                <p>Valkrets: {result?.valkrets_name || 'Alla valkretsar'}</p>
+                <p>Datum: {result?.date}</p>
+                <p>Utskott: {result?.utskott || 'okänd'}</p>
+                {summaryItems.length > 0 ? (
+                    <ul className="summary-list">
+                        {summaryItems.map((item, i) => (
+                        <li key={i}>{item}</li>
+                        ))}
+                    </ul>
+                    ) : (
+                    <p>Ingen sammanfattning tillgänglig</p>
+                )}
+                <p>Dokument: <a href={result?.url} target="_blank" rel="noopener noreferrer">Öppna på riksdagen.se</a></p>
             </div>
         </div>
     )

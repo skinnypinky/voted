@@ -1,0 +1,62 @@
+.ledamoter-page {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.ledamoter-search {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.ledamoter-table {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ledamoter-header {
+    display: flex;
+    padding: 0.75rem 1.5rem;
+    background-color: #f0f0f0;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+}
+
+.ledamoter-header span,
+.ledamoter-row span {
+    flex: 1;
+}
+
+.ledamoter-row button {
+    width: 100px;
+}
+
+.ledamoter-header span:last-child {
+    flex: none;
+    width: 100px;
+}
+
+.ledamoter-row {
+    display: flex;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid #ddd;
+    background: white;
+}
+
+.ledamoter-row:last-child {
+    border-bottom: none;
+}
+
+.visa-btn2 {
+    background: #1a1a2e;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+}

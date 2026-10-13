@@ -4,14 +4,18 @@ def get_all_voting(votering_id, valkrets_id):
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute(
+        query = (
             "SELECT rost, COUNT(*) " \
             "FROM rost " \
             "WHERE votering_id = %s "
-            "AND valkrets_id = %s "
-            "GROUP BY rost;",
-            (votering_id, valkrets_id)
         )
+        params = [votering_id]
+        if valkrets_id is not None:
+            query += " AND valkrets_id = %s "
+            params.append(valkrets_id)
+
+        query += "GROUP BY rost;"
+        cur.execute(query, tuple(params))
         voting = cur.fetchall()
         cur.close()
         conn.close()
@@ -24,15 +28,20 @@ def get_specific_voting(votering_id, valkrets_id):
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute(
+        query = (
             "SELECT l.full_name, p.parti_name, r.rost " \
             "FROM rost r " \
             "JOIN ledamot l ON r.intressent_id = l.intressent_id " \
             "JOIN parti p ON l.parti_id = p.parti_id " \
             "WHERE r.votering_id = %s " \
-            "AND r.valkrets_id = %s;",
-            (votering_id, valkrets_id)
         )
+        params = [votering_id]
+        if valkrets_id is not None:
+            query += " AND r.valkrets_id = %s ORDER BY l.full_name;"
+            params.append(valkrets_id)
+        else:
+            query += "ORDER BY l.full_name LIMIT 500;"
+        cur.execute(query, tuple(params))
         voting = cur.fetchall()
         cur.close()
         conn.close()

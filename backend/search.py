@@ -4,18 +4,26 @@ def get_search_results(valkrets_id, utskott_id):
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute(
-            "SELECT distinct v.votering_id, v.votering_date, u.utskott_name, vk.valkrets_name, vk.valkrets_id " \
-            "FROM votering v " \
-            "JOIN rost r ON v.votering_id = r.votering_id " \
-            "JOIN valkrets vk ON r.valkrets_id = vk.valkrets_id " \
-            "JOIN arende a ON v.hangar_id = a.hangar_id " \
-            "JOIN utskott u ON a.utskott_id = u.utskott_id " \
-            "WHERE r.valkrets_id = %s " \
-            "AND a.utskott_id = %s "
-            "ORDER BY v.votering_date DESC;",
-            (valkrets_id, utskott_id)
+        query = (
+            "SELECT distinct v.votering_id, v.votering_date, u.utskott_name, vk.valkrets_name, vk.valkrets_id, v.title, a.notisrubrik, a.summary, a.url " 
+            "FROM votering v " 
+            "JOIN rost r ON v.votering_id = r.votering_id " 
+            "JOIN valkrets vk ON r.valkrets_id = vk.valkrets_id " 
+            "JOIN arende a ON v.hangar_id = a.hangar_id " 
+            "JOIN utskott u ON a.utskott_id = u.utskott_id " 
+            "WHERE 1=1 " 
         )
+        params = []
+
+        if valkrets_id is not None:
+            query += " AND vk.valkrets_id = %s "
+            params.append(valkrets_id)
+        if utskott_id is not None:
+            query += " AND u.utskott_id = %s "
+            params.append(utskott_id)
+
+        query += "ORDER BY v.votering_date DESC;"
+        cur.execute(query, tuple(params))
         search = cur.fetchall()
         cur.close()
         conn.close()
