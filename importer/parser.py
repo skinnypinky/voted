@@ -219,7 +219,9 @@ def add_ledamot(vote, cur):
             """
             INSERT INTO ledamot (intressent_id, full_name, valkrets_id, parti_id, birth_year, image_url)
             VALUES (%s, %s, %s, %s, %s, %s)
-            ON CONFLICT (intressent_id) DO NOTHING;
+            ON CONFLICT (intressent_id) DO UPDATE
+            SET birth_year = EXCLUDED.birth_year,
+                image_url = EXCLUDED.image_url;
             """,
             (vote["intressent_id"], vote["namn"],vote["valkretsnummer"],vote["parti"], vote["fodd"], image_url)
             )

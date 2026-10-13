@@ -5,7 +5,7 @@ from valkrets import get_all_constituency
 from utskott import get_all_category
 from search import get_search_results, get_valkrets_id, get_utskott_id
 from votering import get_all_voting, get_specific_voting
-from ledamoter import get_all_ledamoter
+from ledamoter import get_all_ledamoter, get_ledamot_details, get_ledamot_stats, get_ledamot_votes
 
 app = Flask(__name__)
 CORS(app)
@@ -55,14 +55,50 @@ def votering():
     specific_voting_results = get_specific_voting(votering_id, valkrets_id)
     return jsonify({
         "summary": [{"rost": row[0], "count": row[1]} for row in all_voting_results],
-        "details": [{"full_name": row[0], "parti_name": row[1], "rost": row[2]} for row in specific_voting_results]
+        "details": [{"full_name": row[0], "parti_name": row[1], "rost": row[2], "intressent_id": row[3]} for row in specific_voting_results]
     }), 200
 
 @app.route('/api/ledamoter', methods=['GET'])
 def ledamoter():
     data = get_all_ledamoter()
-    return jsonify([{"full_name": row[0], "parti_name": row[1], "valkrets_name": row[2]} for row in data]), 200
+    return jsonify([{"intressent_id": row[0], "full_name": row[1], "parti_name": row[2], "valkrets_name": row[3]} for row in data]), 200
 
+@app.route('/api/ledamot/<intressent_id>', methods=['GET'])
+def ledamot_details(intressent_id):
+    info = get_ledamot_details(intressent_id)
+    if info is None:
+        return jsonify({"error": "Ledamot not found"}), 404
+
+    stats = get_ledamot_stats(intressent_id)
+    votes = get_ledamot_votes(intressent_id)
+    total = stats[0]
+
+    return jsonify({
+        "info": {
+            "intressent_id": info[0],
+            "full_name": info[1],
+            "parti_name": info[2],
+            "valkrets_name": info[3],
+            "birth_year": info[4],
+            "image_url": info[5]
+        },
+        "stats": {
+            "total": total,
+            "ja": stats[1],
+            "nej": stats[2],
+            "avstar": stats[3],
+            "franvarande": stats[4], 
+            "narvaro_procent": round(100 * (total - stats[4]) / total, 1) if total else None,
+        },
+        "votes": [{
+            "votering_id": row[0],
+            "date": row[1].strftime("%Y-%m-%d") if row[1] else None,
+            "votering_title": row[2],
+            "notisrubrik": row[3],
+            "utskott": row[4],
+            "rost": row[5]
+        } for row in votes],
+    }), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

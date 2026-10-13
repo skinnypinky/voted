@@ -26,7 +26,7 @@ def get_specific_voting(votering_id, valkrets_id):
         cur = conn.cursor()
         cur.execute(
             """
-            SELECT l.full_name, p.parti_name, r.rost
+            SELECT l.full_name, p.parti_name, r.rost, l.intressent_id
             FROM rost r
             JOIN ledamot l ON r.intressent_id = l.intressent_id
             JOIN parti p   ON r.parti_id = p.parti_id
