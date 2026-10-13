@@ -6,3 +6,5 @@ node_modules/
 importer/data/
 .venv/
 .env
+!importer/data/parties.json
+!importer/data/utskott.json
