@@ -25,11 +25,8 @@ def search():
     valkrets_name = data['valkrets']
     utskott_name = data['utskott']
 
-    valkrets_id = get_valkrets_id(valkrets_name)
-    utskott_id = get_utskott_id(utskott_name)
-
-    if valkrets_id is None or utskott_id is None:
-        return jsonify([]), 200
+    valkrets_id = get_valkrets_id(valkrets_name) if valkrets_name else None
+    utskott_id = get_utskott_id(utskott_name) if utskott_name else None
 
     search_results = get_search_results(valkrets_id, utskott_id)
     return jsonify([{
@@ -37,7 +34,11 @@ def search():
         "date": row[1].strftime("%Y-%m-%d") if row[1] else None,
         "utskott": row[2],
         "valkrets_name": row[3],
-        "valkrets_id": row[4]
+        "valkrets_id": row[4],
+        "titel": row[5],
+        "notisrubrik": row[6],
+        "summary": row[7],
+        "url": row[8]
     } for row in search_results]), 200
 
 @app.route('/api/votering', methods=['POST'])
@@ -51,7 +52,12 @@ def votering():
     return jsonify({
         "summary": [{"rost": row[0], "count": row[1]} for row in all_voting_results],
         "details": [{"full_name": row[0], "parti_name": row[1], "rost": row[2]} for row in specific_voting_results]
-    })
+    }), 200
+
+@app.route('/api/ledamoter', methods=['GET'])
+def ledamoter():
+    data = get_all_ledamoter()
+    return jsonify([{"full_name": row[0], "parti_name": row[1], "valkrets_name": row[2]} for row in data]), 200
 
 
 if __name__ == '__main__':
