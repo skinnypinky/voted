@@ -34,3 +34,5 @@ npm run dev (ladda ner npm annars, va i venv och pip install tror jag)
 * Köra API endpointsen
 (från root) cd backend
 python eller python3 app.py
+
+sen localhost:5713
