@@ -17,7 +17,7 @@ cp .env.example .env
 bash importer/run.sh
 
 ### Enter DB
-docker compose exec db psql -U postgres -d voted
+docker-compose exec db psql -U postgres -d voted
 
 ### Shutdown
 stop db:

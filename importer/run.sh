@@ -19,7 +19,7 @@ set +a
 bash "$ROOT_DIR/importer/download_data.sh"
 
 echo "Starting database..."
-docker compose up -d
+docker-compose up -d
 "$ROOT_DIR/database/migrate.sh"
 
 echo "Importing voting data..."

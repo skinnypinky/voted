@@ -21,7 +21,7 @@ function Home() {
       })
     })
       .then(res => res.json())
-      .then(data => navigate('/search', { state: { results: data } }))
+      .then(data => navigate('/search', { state: { results: data, selectedValkrets, selectedUtskott } }))
   }
 
   useEffect(() => {
@@ -40,7 +40,6 @@ function Home() {
     <div className="background">
       <main>
         <h1>VOTED</h1>
-        <img src={alex} />
         <div className="filter-bar">
           <div className="filter-group">
             <label>Valkrets</label>
