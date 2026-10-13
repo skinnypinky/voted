@@ -76,7 +76,7 @@ function Votering() {
                 </div>
             </div>
             <div className="votering-info">
-                <h2>{result?.titel || 'okänd'}</h2>
+                <h2>{result?.votering_title || 'okänd'}</h2>
                 <p>Valkrets: {result?.valkrets_name || 'Alla valkretsar'}</p>
                 <p>Datum: {result?.date}</p>
                 <p>Utskott: {result?.utskott || 'okänd'}</p>

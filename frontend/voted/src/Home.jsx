@@ -10,6 +10,7 @@ function Home() {
 
   const [selectedValkrets, setSelectedValkrets] = useState("")
   const [selectedUtskott, setSelectedUtskott] = useState("")
+  const [query, setQuery] = useState("")
 
   function handleSearch() {
     fetch('http://127.0.0.1:5000/api/search', {
@@ -17,7 +18,8 @@ function Home() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         valkrets: selectedValkrets,
-        utskott: selectedUtskott
+        utskott: selectedUtskott,
+        q: query
       })
     })
       .then(res => res.json())
@@ -58,7 +60,13 @@ function Home() {
           <div className="filter-group">
             <label>Sök efter fråga</label>
             <div className="search-row">
-              <input type="" placeholder="Sök..." />
+              <input
+                type="text"
+                placeholder="Sök..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              />
               <button onClick={handleSearch}>Sök</button>
             </div>
           </div>

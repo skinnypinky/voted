@@ -5,29 +5,6 @@ def get_search_results(valkrets_id=None, utskott_id=None, q=None):
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-<<<<<<< HEAD
-        query = (
-            "SELECT distinct v.votering_id, v.votering_date, u.utskott_name, vk.valkrets_name, vk.valkrets_id, v.title, a.notisrubrik, a.summary, a.url " 
-            "FROM votering v " 
-            "JOIN rost r ON v.votering_id = r.votering_id " 
-            "JOIN valkrets vk ON r.valkrets_id = vk.valkrets_id " 
-            "JOIN arende a ON v.hangar_id = a.hangar_id " 
-            "JOIN utskott u ON a.utskott_id = u.utskott_id " 
-            "WHERE 1=1 " 
-        )
-        params = []
-
-        if valkrets_id is not None:
-            query += " AND vk.valkrets_id = %s "
-            params.append(valkrets_id)
-        if utskott_id is not None:
-            query += " AND u.utskott_id = %s "
-            params.append(utskott_id)
-
-        query += "ORDER BY v.votering_date DESC;"
-        cur.execute(query, tuple(params))
-        search = cur.fetchall()
-=======
         cur.execute(
             """
             SELECT v.votering_id, -- row[0]
@@ -38,6 +15,8 @@ def get_search_results(valkrets_id=None, utskott_id=None, q=None):
                    v.title, -- row[5]
                    a.notation, -- row[6]
                    a.riksmote, -- row[7]
+                   a.summary, -- row[8]
+                   a.url, -- row[9]
                    ts_rank(a.search_vector, websearch_to_tsquery('swedish', %(q)s::text)) AS rank
             FROM votering v
             JOIN arende a       ON a.hangar_id  = v.hangar_id
@@ -57,7 +36,6 @@ def get_search_results(valkrets_id=None, utskott_id=None, q=None):
             {"valkrets_id": valkrets_id, "utskott_id": utskott_id, "q": q},
         )
         rows = cur.fetchall()
->>>>>>> 281c81b88b9a0769573498d99365725a1ecd8dc1
         cur.close()
         conn.close()
         return rows

@@ -25,3 +25,12 @@ docker compose down
 
 or completely reset db:
 docker compose down -v
+
+### Frontend
+* Köra sidan
+(från root) cd frontend/voted
+npm run dev (ladda ner npm annars, va i venv och pip install tror jag)
+
+* Köra API endpointsen
+(från root) cd backend
+python eller python3 app.py

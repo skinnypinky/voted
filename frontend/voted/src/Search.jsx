@@ -16,8 +16,8 @@
                 {results.map((result, index) => (
                     <div key={index} className="search-result-card">
                         <div className="search-result-info">
-                            <h3>{result.titel || 'okänd'}</h3>
-                            <p>{result.notisrubrik || 'okänd'}</p>
+                            <h3>{result.votering_title || 'okänd'}</h3>
+                            <p>{result.rubrik || 'okänd'}</p>
                             <p>{result.date}</p>
                         </div>
                         <button className="visa-btn" onClick={() => navigate(`/search/${result.votering_id}`, { state: { result, selectedValkrets : state?.selectedValkrets }})}>Visa votering</button>

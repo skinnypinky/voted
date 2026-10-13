@@ -16,7 +16,7 @@ set -a
 source .env
 set +a
 
-bash "$ROOT_DIR/scripts/download_data.sh"
+bash "$ROOT_DIR/importer/download_data.sh"
 
 echo "Starting database..."
 docker-compose up -d
