@@ -1,0 +1,92 @@
+.profil-page {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.profil-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.profil-header h2 {
+    margin: 0 0 0.5rem 0;
+}
+
+.profil-header p {
+    margin: 0.2rem 0;
+    color: #555;
+}
+
+.profil-bild {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+}
+
+.profil-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    color: #777;
+    font-size: 0.85rem;
+}
+
+
+.profil-votes {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.vote-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid #ddd;
+    background: white;
+}
+
+.vote-row:last-child {
+    border-bottom: none;
+}
+
+.vote-meta {
+    margin: 0.25rem 0 0 0;
+    color: #777;
+    font-size: 0.85rem;
+}
+
+.vote-rost {
+    white-space: nowrap;
+}
+
+.rost-ja { color: #2e7d32; }
+.rost-nej { color: #c62828; }
+.rost-avstår { color: #b8860b; }
+.rost-frånvarande { color: #888; }

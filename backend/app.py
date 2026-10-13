@@ -55,7 +55,7 @@ def votering():
     specific_voting_results = get_specific_voting(votering_id, valkrets_id)
     return jsonify({
         "summary": [{"rost": row[0], "count": row[1]} for row in all_voting_results],
-        "details": [{"full_name": row[0], "parti_name": row[1], "rost": row[2]} for row in specific_voting_results]
+        "details": [{"full_name": row[0], "parti_name": row[1], "rost": row[2], "intressent_id": row[3]} for row in specific_voting_results]
     }), 200
 
 @app.route('/api/ledamoter', methods=['GET'])

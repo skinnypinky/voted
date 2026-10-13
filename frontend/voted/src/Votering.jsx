@@ -1,4 +1,4 @@
-import { useParams, useLocation } from 'react-router-dom'
+import { useParams, useLocation, Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import './Votering.css'
 
@@ -57,9 +57,9 @@ function Votering() {
                 <div className="results-list">
                     {details.map((detail, index) => (
                         <div key={index} className="result-card">
-                            <span>{detail.full_name}</span>
+                            <Link to={`/ledamoter/${detail.intressent_id}`} className="ledamot-link"> {detail.full_name}</Link>
                             <span className="parti-badge" style={{ backgroundColor: partyColors[detail.parti_name] || '#999' }}>{detail.parti_name}</span>
-                            <span className={voteColor(detail.rost)}>{detail.rost}</span>
+                            <span className={`rost-${detail.rost.toLowerCase()}`}>{detail.rost}</span>
                         </div>
                     ))}
                 </div>

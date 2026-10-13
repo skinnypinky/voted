@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './Ledamoter.css'
+
 
 function Ledamoter() {
     const [ledamoter, setLedamoter] = useState([])
     const [search, setSearch] = useState("")
+    const navigate = useNavigate()
 
     useEffect(() => {
         fetch('http://127.0.0.1:5000/api/ledamoter')
@@ -34,11 +37,11 @@ function Ledamoter() {
                     <span>Profil</span>
                 </div>
                 {filtered.map((ledamot, index) => (
-                    <div key={index} className="ledamoter-row">
+                    <div key={ledamot.intressent_id} className="ledamoter-row">
                         <span>{ledamot.full_name}</span>
                         <span>{ledamot.parti_name}</span>
                         <span>{ledamot.valkrets_name}</span>
-                        <button className="visa-btn2">Visa profil</button>
+                        <button className="visa-btn2" onClick={() => navigate(`/ledamoter/${ledamot.intressent_id}`)}>Visa profil</button>
                     </div>
                 ))}
             </div>
